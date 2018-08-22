@@ -1,5 +1,6 @@
 import React from 'react'
 import "./FormExample.css"
+import axios from 'axios'
 import { FormGroup , ControlLabel , FormControl , Button } from 'react-bootstrap'
 
 class FormExample extends React.Component {
@@ -13,7 +14,8 @@ class FormExample extends React.Component {
             value: '',
             chromosome: '',
             position: '',
-            allele: ''
+            allele: '',
+            result: ''
         }
     }
 
@@ -55,13 +57,49 @@ class FormExample extends React.Component {
              this.getPositionValidationState() === 'success' &&
              this.getAlleleValidationState() === 'success'
         ){
-            alert('validated, let\'s query the shit out of it')
-        } else alert( 'you obviously fucked up')
+            this.setState({
+                result: "we're now querying the beacon"
+            })
+        } else {
+            this.setState({
+            result: "Yo man, check your input!"
+            })
+        }
         event.preventDefault()
     }
 
+    doQuery() {
+        axios
+      .get("https://jsonplaceholder.typicode.com/users")
+      .then(response => {
+
+        // create an array of contacts only with relevant data
+        const newContacts = response.data.map(c => {
+          return {
+            id: c.id,
+            name: c.name
+          };
+        });
+
+        // create a new "State" object without mutating
+        // the original State object.
+        const newState = Object.assign({}, this.state, {
+          contacts: newContacts
+        });
+
+        // store the new state object in the component's state
+        this.setState(newState);
+      })
+      .catch(error => console.log(error));
+
+
+
+
+    }
+    
     render() {
         return (
+            <div id="query">
             <form
             onSubmit={this.handleSubmit}>
             <FormGroup       
@@ -112,10 +150,11 @@ class FormExample extends React.Component {
             <Button type="submit"
             >Submit</Button>
             </form>
-            <Alert>
-            Currently no result available
-            </Alert>
-        );
+            <div id="result">
+                <h1 className="resultText">{this.state.result}</h1>
+            </div>
+            </div>
+        )
     }
 }
 
