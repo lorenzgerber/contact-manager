@@ -45,28 +45,12 @@ class FormExample extends React.Component {
     }
 
     doQuery() {
-        var query = 'http://localhost:9075/elixirbeacon/v03/beacon/query?referenceName='
-        var end = '&assemblyId=GRCh37'
-        query = query + this.state.chromosome +'&start=' + this.state.position + '&allele=' + this.state.allele + end
-        axios(query)
+        axios
+        .get("http://localhost:9075/elixirbeacon/v03/beacon/query?referenceName=11&start=1951960&allele=G&assemblyId=GRCh37")
         .then(res => {
-            console.log(res)
             this.setState({
                 exists: res.data.exists
             })
-            if (this.state.exists !== '') {
-                if (this.state.exists) {
-                    this.setState({
-                        result: "It exists"
-                    })
-                } else {
-                    this.setState({
-                        result: "It does not exist"
-                    })
-                }
-
-            }
-
         })
         .catch(error => console.log(error))
     }
@@ -81,21 +65,22 @@ class FormExample extends React.Component {
         })
     }
 
-    handleSubmit (event) {
-
-        event.preventDefault()
-
+    handleSubmit(event) {
         if ( this.getChromosomeValidationState() === 'success' && 
              this.getPositionValidationState() === 'success' &&
              this.getAlleleValidationState() === 'success'
         ){
             this.doQuery()
+            setTimeout(console.log(this.state.exists),1000)
+            this.setState({
+                result: "we're now querying the beacon"
+            })
         } else {
             this.setState({
             result: "Yo man, check your input!"
             })
         }
-        
+        event.preventDefault()
     }
 
 
@@ -103,7 +88,7 @@ class FormExample extends React.Component {
     render() {
         return (
             <div id="query">
-            <form onSubmit={this.handleSubmit}>
+            <form>
             <FormGroup       
             controlId="formBasicText"
             validationState={this.getChromosomeValidationState()}
@@ -155,6 +140,7 @@ class FormExample extends React.Component {
             <div id="result">
                 <h1 className="resultText">{this.state.result}</h1>
             </div>
+            <Button type="button" bsstyle="primary">Query</Button>
             </div>
         )
     }
